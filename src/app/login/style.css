@@ -1,0 +1,110 @@
+input {
+  background-color: var(--color-ebony-clay);
+  border-radius: 8px;
+}
+
+.btn {
+  background-color: #9d1821;
+  color: rgb(211, 205, 205);
+  height: 40px;
+  width: 140px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px white solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: top 0.5s;
+  margin: 0;
+  color: rgb(211, 205, 205);
+  font-weight: 600;
+}
+
+.btn .btn-text-one {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.btn .btn-text-two {
+  position: absolute;
+  width: 100%;
+  top: 150%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.btn:hover .btn-text-one {
+  top: -100%;
+}
+
+.btn:hover .btn-text-two {
+  top: 50%;
+}
+
+.bg {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  background: #9d1821;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  padding: 60px;
+  transition: border-radius 400ms ease-in-out, transform 400ms ease-in-out;
+}
+
+.bg.login {
+  transform: translateX(100%);
+  border-radius: 0 8px 8px 0;
+}
+
+.bg.register {
+  transform: translateX(0);
+  border-radius: 8px 0 0 8px;
+}
+
+.panel {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 0;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 99;
+  gap: 20px;
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+
+.panel-login {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.panel-login.exit {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.panel-register {
+  transform: translateX(0);
+  opacity: 1;
+  right: 0;
+}
+
+.panel-register.exit {
+  transform: translateX(100%);
+  opacity: 0;
+}
