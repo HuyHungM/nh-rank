@@ -15,8 +15,8 @@ import { OSubmission } from "@/models/Submission";
 
 interface Props {
   ref: React.RefObject<HTMLDivElement | null>;
-  problem: OProblem;
-  submissions: OSubmission[];
+  problem: OProblem | null;
+  submissions: OSubmission[] | null;
 }
 
 export default function SidebarContainer({ ref, problem, submissions }: Props) {
@@ -79,7 +79,7 @@ export default function SidebarContainer({ ref, problem, submissions }: Props) {
       <div className="h-full flex-1 bg-ebony-clay min-w-0 max-[995px]:h-auto max-[995px]:w-full max-[995px]:min-w-full max-[995px]:pb-6">
         {(tab === "problem" && <ProblemContainer problem={problem} />) ||
           (tab === "history" && (
-            <HistoryContainer submissions={submissions!} />
+            <HistoryContainer submissions={submissions} />
           )) ||
           (tab === "comment" && <CommentContainer />)}
       </div>

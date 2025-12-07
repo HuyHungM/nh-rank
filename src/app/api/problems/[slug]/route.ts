@@ -18,6 +18,7 @@ export async function GET(
       );
 
     return NextResponse.json({
+      ok: true,
       problem: {
         ...problem,
         _id: problem._id.toString(),

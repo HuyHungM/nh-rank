@@ -57,7 +57,7 @@ export default function Navbar({ collapse = false }: Props) {
             className={`${
               !collapse ? "w-12 h-12" : "w-8 h-8"
             } rounded-full border border-gray-900 cursor-pointer transition duration-150 hover:brightness-[.8]`}
-            src={user.avatarUrl}
+            src={user!.avatarUrl}
             width={64}
             height={64}
             alt="avatar"

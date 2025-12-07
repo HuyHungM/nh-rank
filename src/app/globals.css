@@ -70,6 +70,14 @@ body {
   transition: border 0ms ease !important;
 }
 
+.ant-table-placeholder {
+  background-color: var(--color-ebony-clay) !important;
+}
+
+.ant-empty-description {
+  color: white !important;
+}
+
 .ant-table-thead > tr > th {
   background-color: transparent !important;
   color: #c8c8c8 !important;

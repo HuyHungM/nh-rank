@@ -156,6 +156,7 @@ export async function POST(req: Request) {
     }
 
     const testResults = results.map((res: any, i: number) => {
+      const expected = problem.testcases[i].output.trim();
       const output = res.stdout
         ? Buffer.from(res.stdout, "base64").toString().trim()
         : "";
@@ -196,7 +197,7 @@ export async function POST(req: Request) {
     const newSub = await Submission.create({
       userId: userId,
       problemId,
-      sourceCode,
+      sourceCode: sourceCode,
       point,
       status,
       runtime: Math.max(...testResults.map((t) => t.time || 0)),

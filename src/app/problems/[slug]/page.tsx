@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { use, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BiHome } from "react-icons/bi";
 
 import Navbar from "@/components/home/Navbar";
@@ -16,34 +17,44 @@ export default function Problem({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const [problem, setProblem] = useState<OProblem | null>(null);
-  const [submissions, setSubmissions] = useState<OSubmission[] | null>(null);
 
-  useEffect(() => {
-    async function getProblem() {
+  const {
+    data: problem = null,
+    isLoading: loadingProblem,
+    isError: errorProblem,
+  } = useQuery({
+    queryKey: ["problem", slug],
+    queryFn: async () => {
       const res = await fetch(`/api/problems/${slug}`, {
         method: "GET",
       });
-      await res.json().then((data) => {
-        setProblem(data.problem);
-      });
-    }
-    getProblem();
-  }, []);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      return data.problem as OProblem;
+    },
+    enabled: true,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    if (!problem) return;
-    const getSubmissions = async () => {
-      if (submissions) return;
+  const {
+    data: submissions = null,
+    isLoading: loadingSubmissions,
+    isError: errorSubmissions,
+    refetch: refetchSubmissions,
+  } = useQuery({
+    queryKey: ["submissions", problem?._id],
+    queryFn: async () => {
       const res = await fetch(`/api/submissions?problemId=${problem?._id}`, {
         method: "GET",
       });
-      await res.json().then((data) => {
-        setSubmissions(data.submissions);
-      });
-    };
-    getSubmissions();
-  }, [problem]);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      return data.submissions as OSubmission[];
+    },
+    enabled: !!problem?._id,
+    staleTime: 1000 * 30,
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
@@ -89,20 +100,23 @@ export default function Problem({
       <Navbar collapse={true} />
 
       <div className="h-10 w-full bg-ebony-clay flex gap-x-1 items-center py-2 px-4 border-b border-solid border-gray-700">
-        <span>
-          <BiHome />
-        </span>
-        /
-        <Link
-          href={`/topics/${problem?.topic._id}`}
-          className="hover:text-dodger-blue transition-colors duration-300"
-        >
-          {problem ? problem.topic.name : "Đang tải..."}
-        </Link>
-        /
-        <span className="font-bold uppercase">
-          {problem ? problem.title : "Đang tải..."}
-        </span>
+        {(problem && (
+          <>
+            <span>
+              <BiHome />
+            </span>
+            /
+            <Link
+              href={`/topics/${problem.topic._id}`}
+              className="hover:text-dodger-blue transition-colors duration-300"
+            >
+              {problem.topic.name}
+            </Link>
+            /<span className="font-bold uppercase">{problem.title}</span>
+          </>
+        )) || (
+          <div className="h-full w-[200px] max-w-full rounded-md bg-gray-400 animate-pulse"></div>
+        )}
       </div>
       <div
         className="w-full h-full overflow-hidden flex relative select-none max-[995px]:flex-col max-[995px]:h-auto max-[995px]:overflow-auto"
@@ -110,8 +124,8 @@ export default function Problem({
       >
         <SidebarContainer
           ref={leftRef}
-          problem={problem!}
-          submissions={submissions!}
+          problem={problem}
+          submissions={submissions}
         />
         <div
           className="h-full w-1.5 bg-gray-700 cursor-col-resize flex items-center justify-center overflow-hidden resize-line"
@@ -122,8 +136,8 @@ export default function Problem({
         </div>
         <EditorContainer
           ref={rightRef}
-          problem={problem!}
-          submissions={submissions!}
+          problem={problem}
+          submissions={submissions}
         />
       </div>
     </div>

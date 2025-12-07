@@ -13,8 +13,8 @@ import { OProblem } from "@/models/Problem";
 
 interface Props {
   ref: React.Ref<HTMLDivElement | null>;
-  problem: OProblem;
-  submissions: OSubmission[];
+  problem: OProblem | null;
+  submissions: OSubmission[] | null;
 }
 
 export default function EditorContainer({ ref, problem, submissions }: Props) {

@@ -11,6 +11,7 @@ import { User } from "@/models";
 import dbConnect from "@/lib/mongoose";
 
 import "./globals.css";
+import QueryProvider from "@/context/QueryProvider";
 
 const inter = Inter({ style: "normal", subsets: ["latin", "vietnamese"] });
 
@@ -39,8 +40,17 @@ export default async function RootLayout({
         id: string;
         role: UserRole;
       };
-      user = await User.findById(payload.id).lean<OUser>();
-      user = JSON.parse(JSON.stringify(user)) as OUser;
+      const dbUser = await User.findById(payload.id)
+        .select("username name avatarUrl role _id createdAt")
+        .lean<OUser>({ virtuals: true });
+
+      if (dbUser) {
+        user = {
+          ...dbUser,
+          _id: dbUser._id.toString(),
+          createdAt: dbUser.createdAt.toString(),
+        };
+      }
     } catch (err) {
       console.error(err);
     }
@@ -51,14 +61,16 @@ export default async function RootLayout({
       <body
         className={`${inter.className} relative w-screen h-auto overflow-x-hidden overflow-y-auto min-h-screen antialiased`}
       >
-        <NotificationProvider>
-          {user ? (
-            <UserProvider user={user}>{children}</UserProvider>
-          ) : (
-            children
-          )}
-          <NotificationContainer />
-        </NotificationProvider>
+        <QueryProvider>
+          <NotificationProvider>
+            {user ? (
+              <UserProvider user={user}> {children}</UserProvider>
+            ) : (
+              children
+            )}
+            <NotificationContainer />
+          </NotificationProvider>
+        </QueryProvider>
       </body>
     </html>
   );

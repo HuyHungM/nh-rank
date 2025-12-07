@@ -13,7 +13,7 @@ import Image from "next/image";
 import formatDate from "@/hooks/formatDate";
 
 interface Props {
-  submissions: OSubmission[];
+  submissions: OSubmission[] | null;
 }
 
 export default function HistoryContainer({
@@ -37,7 +37,7 @@ export default function HistoryContainer({
     });
 
   const dataSource = onlyMe
-    ? rankedSubmissions.filter((s) => s.userId._id === user?._id)
+    ? rankedSubmissions?.filter((s) => s.userId._id === user?._id)
     : rankedSubmissions;
 
   useEffect(() => {
@@ -121,6 +121,7 @@ export default function HistoryContainer({
   ];
 
   const handleMyRowClick = (record: OSubmission) => {
+    console.log(record.userId._id, user._id);
     if (record.userId._id === user._id) {
       query.set({ submission: record._id });
     }
@@ -132,12 +133,14 @@ export default function HistoryContainer({
       ref={ref}
     >
       <div className="flex w-full px-4 py-2 h-auto justify-between">
-        <div className="flex text-dodger-blue items-center gap-1">
-          <BsCodeSlash />
-          <span className="font-bold text-sm">
-            {dataSource ? dataSource.length : "Đang tải..."}
-          </span>
-        </div>
+        {(dataSource && (
+          <div className="flex text-dodger-blue items-center gap-1">
+            <BsCodeSlash />
+            <span className="font-bold text-sm">{dataSource.length}</span>
+          </div>
+        )) || (
+          <div className="h-5 w-[50px] max-w-full rounded-md bg-gray-400 animate-pulse"></div>
+        )}
         <Tooltip placement="top" title="Chỉ mình tôi">
           <button
             className={`text-lg cursor-pointer hover:brightness-75 transition-all duration-300 px-3 py-0.75 rounded-3xl ${
@@ -149,20 +152,28 @@ export default function HistoryContainer({
           </button>
         </Tooltip>
       </div>
-      <Table
-        className="min-w-[300px]"
-        dataSource={dataSource}
-        rowKey={"_id"}
-        rowClassName={(record) => {
-          const isMe = record.userId._id === user._id;
-          return isMe ? "text-white cursor-pointer" : "text-dodger-blue";
-        }}
-        onRow={(record) => ({
-          onClick: () => handleMyRowClick(record),
-        })}
-        columns={columns}
-        pagination={false}
-      />
+      {(dataSource && (
+        <Table
+          className="min-w-[300px]"
+          dataSource={dataSource}
+          rowKey={"_id"}
+          rowClassName={(record) => {
+            const isMe = record.userId._id === user._id;
+            return isMe ? "text-white cursor-pointer" : "text-dodger-blue";
+          }}
+          onRow={(record) => ({
+            onClick: () => handleMyRowClick(record),
+          })}
+          columns={columns}
+          pagination={false}
+        />
+      )) || (
+        <div className="flex flex-col px-2 gap-3 mt-5">
+          <div className="h-[74px] w-full rounded-md bg-gray-400 animate-pulse"></div>
+          <div className="h-[74px] w-full rounded-md bg-gray-400 animate-pulse"></div>
+          <div className="h-[74px] w-full rounded-md bg-gray-400 animate-pulse"></div>
+        </div>
+      )}
     </div>
   );
 }
