@@ -41,7 +41,7 @@ export async function GET(req: Request) {
     if (problemId) {
       const submissions = await Submission.find({ problemId })
         .populate("userId", "username name avatarUrl")
-        .sort({ point: -1, createdAt: 1 })
+        .sort({ createdAt: -1 })
         .lean();
 
       return NextResponse.json(
@@ -214,10 +214,24 @@ async function submitSubmission(
   });
 
   const passedCount = testResults.filter((t) => t.passed).length;
+  const failedCount = problem.testcases.length - passedCount;
   const point = Number(
     ((passedCount / problem.testcases.length) * problem.point).toFixed(2)
   );
-  const status = passedCount === problem.testcases.length ? "AC" : "WA";
+
+  let status;
+
+  if (failedCount === 0) {
+    status = "AC";
+  } else if (testResults.some((t) => t.status === "TLE")) {
+    status = "TLE";
+  } else if (testResults.some((t) => t.status === "CE")) {
+    status = "CE";
+  } else if (testResults.some((t) => t.status === "RE")) {
+    status = "RE";
+  } else {
+    status = "WA";
+  }
 
   const newSub = await Submission.create({
     userId: userId,

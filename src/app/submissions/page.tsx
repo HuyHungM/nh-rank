@@ -43,6 +43,17 @@ export default function Submission() {
     router.push(`/problems/${record.problemId._id}`);
   };
 
+  const StatusColor = {
+    AC: "text-green-400",
+    WA: "text-red-400",
+    TLE: "text-gray-400",
+    CE: "text-orange-400",
+    RE: "text-yellow-400",
+  };
+
+  const statuses = ["AC", "WA", "TLE", "CE", "RE"] as const;
+  type StatusType = (typeof statuses)[number];
+
   const columns = [
     {
       title: (
@@ -54,7 +65,7 @@ export default function Submission() {
       key: "number",
       width: 70,
       className: "text-center",
-      render: (val: any) => <span className="font-normal">{val}</span>,
+      render: (val: string) => <span className="font-normal">{val}</span>,
     },
     {
       title: "Tên",
@@ -68,15 +79,25 @@ export default function Submission() {
       dataIndex: "problemId",
       key: "problemId",
       render: (val: any) => (
-        <span className="font-normal text-green-400">{val.title}</span>
+        <span className="font-normal text-yellow-400">{val.title}</span>
       ),
+    },
+    {
+      title: <div className="text-center w-full">Trạng thái</div>,
+      dataIndex: "status",
+      key: "status",
+      className: "text-center",
+      render: (val: StatusType) => (
+        <span className={`font-normal ${StatusColor[val]}`}>{val}</span>
+      ),
+      width: 100,
     },
     {
       title: <div className="text-center w-full">Điểm</div>,
       dataIndex: "point",
       key: "point",
       className: "text-center",
-      render: (val: any, record: any) => (
+      render: (val: string, record: any) => (
         <div className="font-normal">
           <span className="text-dodger-blue">{val}</span>/
           <span>{record.problemId.point}</span>
@@ -85,11 +106,38 @@ export default function Submission() {
       width: 80,
     },
     {
+      title: <div className="text-center w-full">Bộ nhớ</div>,
+      dataIndex: "memory",
+      key: "memory",
+      className: "text-center",
+      render: (val: number) => (
+        <span className={`font-normal`}>
+          <span className="text-dodger-blue">
+            {Number((val / 1024).toFixed(2))}
+          </span>{" "}
+          MB
+        </span>
+      ),
+      width: 100,
+    },
+    {
       title: <div className="text-center w-full">Thời gian</div>,
+      dataIndex: "runtime",
+      key: "runtime",
+      className: "text-center",
+      render: (val: number) => (
+        <span className={`font-normal`}>
+          <span className="text-dodger-blue">{val * 1000}</span>ms
+        </span>
+      ),
+      width: 100,
+    },
+    {
+      title: <div className="text-center w-full">Nộp lúc</div>,
       dataIndex: "createdAt",
       key: "createdAt",
       className: "text-center",
-      render: (val: any) => (
+      render: (val: string) => (
         <span className="font-normal">{formatDate(val)}</span>
       ),
       width: 160,

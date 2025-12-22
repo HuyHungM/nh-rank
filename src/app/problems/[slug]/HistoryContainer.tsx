@@ -25,16 +25,10 @@ export default function HistoryContainer({
   const ref = useRef<HTMLDivElement | null>(null);
   const query = useQueries();
 
-  const rankedSubmissions = rawSubmissions
-    ?.map((sub, index) => ({
-      ...sub,
-      rank: index + 1,
-    }))
-    .sort((a, b) => {
-      if (b.point !== a.point) return b.point - a.point;
-      if (b.runtime !== a.runtime) return (a.runtime || 0) - (b.runtime || 0);
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  const rankedSubmissions = rawSubmissions?.map((sub, index) => ({
+    ...sub,
+    rank: index + 1,
+  }));
 
   const dataSource = onlyMe
     ? rankedSubmissions?.filter((s) => s.userId._id === user?._id)

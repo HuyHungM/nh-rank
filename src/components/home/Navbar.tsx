@@ -34,7 +34,7 @@ export default function Navbar({ collapse = false }: Props) {
           loading="eager"
         ></Image>
       </Link>
-      <ul className="flex items-center w-fit h-full font-bold">
+      <ul className="flex items-center w-fit h-full font-bold max-[680px]:hidden">
         <li>
           <Link href={"/"} className="nav-item">
             TRANG CHỦ
