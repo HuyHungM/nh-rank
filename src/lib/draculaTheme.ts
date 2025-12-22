@@ -39,6 +39,10 @@ export const draculaTheme = EditorView.theme(
       backgroundColor: "#ffffff10",
     },
 
+    ".cm-foldGutter": {
+      backgroundColor: "#27293d",
+    },
+
     ".cm-selectionBackground": {
       backgroundColor: "#44475a80 !important",
     },

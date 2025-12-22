@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 type Testcase = {
-  message: string;
+  title: string;
   output: string;
   passed: boolean;
   time?: number;
@@ -38,7 +38,7 @@ export interface OSubmission {
 
 const TestcaseSchema = new Schema<Testcase>(
   {
-    message: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true },
     output: { type: String, required: true, trim: true },
     passed: { type: Boolean, required: true },
     time: { type: Number, required: false },

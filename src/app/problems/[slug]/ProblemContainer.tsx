@@ -8,7 +8,7 @@ interface Props {
 
 export default function ProblemContainer({ problem }: Props) {
   return (
-    <div className="w-full h-full flex flex-col px-4 overflow-x-hidden overflow-y-auto pb-4 max-[995px]:h-auto">
+    <div className="w-full h-full flex flex-col px-4 overflow-x-hidden overflow-y-auto pb-4 max-[995px]:h-auto select-text">
       <div className="min-h-16 flex items-center gap-4 font-bold text-sm">
         <div className="flex gap-1 items-center">
           {(problem && (

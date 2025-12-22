@@ -18,13 +18,13 @@ export async function POST(req: Request) {
     if (!user)
       return NextResponse.json(
         { ok: false, error: "Thông tin không hợp lệ" },
-        { status: 500 }
+        { status: 404 }
       );
     const ok = bcrypt.compare(password, user.password!);
     if (!ok)
       return NextResponse.json(
         { ok: false, error: "Thông tin không hợp lệ" },
-        { status: 500 }
+        { status: 404 }
       );
 
     const payload = { id: user._id!.toString(), role: user.role };

@@ -17,8 +17,8 @@ export async function POST(req: Request) {
     const exists = await User.findOne({ username });
     if (exists)
       return NextResponse.json(
-        { ok: false, error: "Tên đăng nhập đã tồn tại" },
-        { status: 400 }
+        { ok: false, error: "Tên đăng nhập đã tồn tại!" },
+        { status: 409 }
       );
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { ok: false, error: "Đăng ký thất bại" },
+      { ok: false, error: "Đăng ký thất bại!" },
       { status: 500 }
     );
   }

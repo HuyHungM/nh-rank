@@ -8,13 +8,26 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
+    if (slug.length != 24)
+      return NextResponse.json(
+        {
+          ok: false,
+          problem: null,
+          error: "Bài tập không tồn tại!",
+        },
+        { status: 404 }
+      );
     await dbConnect();
 
     const problem = await Problem.findById(slug).populate("topic").lean();
     if (!problem)
       return NextResponse.json(
-        { ok: false, problem: null, error: "Không tìm thấy bài này" },
-        { status: 500 }
+        {
+          ok: false,
+          problem: null,
+          error: "Bài tập không tồn tại!",
+        },
+        { status: 404 }
       );
 
     return NextResponse.json({
@@ -29,7 +42,11 @@ export async function GET(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { ok: false, problem: null, error: "Không tìm thấy bài này" },
+      {
+        ok: false,
+        problem: null,
+        error: "Lỗi máy chủ!",
+      },
       { status: 500 }
     );
   }

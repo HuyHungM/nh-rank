@@ -15,10 +15,11 @@ export default function NotificationContainer() {
             key={n.id}
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 120, opacity: 0 }}
+            exit={{ x: 120, y: 120, opacity: 0 }}
             transition={{
               x: { duration: 0.8, ease: [0.68, -0.55, 0.265, 1.55] },
               opacity: { duration: 0.8, ease: [0.68, -0.55, 0.265, 1.55] },
+              y: { duration: 1.2, ease: [0.68, -0.55, 0.265, 1.55] },
             }}
             className={`grid grid-cols-[40px_auto] h-10 overflow-hidden max-w-[400px] w-auto rounded-sm border-2 border-white`}
           >

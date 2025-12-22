@@ -6,7 +6,7 @@ import { BsCodeSlash } from "react-icons/bs";
 import { CiCreditCard1 } from "react-icons/ci";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { LuAlarmClock } from "react-icons/lu";
-import useQuery from "@/hooks/useQuery";
+import useQueries from "@/hooks/useQueries";
 import { OSubmission } from "@/models/Submission";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
@@ -23,7 +23,7 @@ export default function HistoryContainer({
   const [width, setWidth] = useState(0);
   const { user } = useUser();
   const ref = useRef<HTMLDivElement | null>(null);
-  const query = useQuery();
+  const query = useQueries();
 
   const rankedSubmissions = rawSubmissions
     ?.map((sub, index) => ({
@@ -121,7 +121,6 @@ export default function HistoryContainer({
   ];
 
   const handleMyRowClick = (record: OSubmission) => {
-    console.log(record.userId._id, user._id);
     if (record.userId._id === user._id) {
       query.set({ submission: record._id });
     }

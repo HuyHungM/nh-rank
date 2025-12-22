@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     if (!refreshToken)
       return NextResponse.json(
-        { ok: false, error: "No refresh token" },
+        { ok: false, error: "No refresh token!" },
         { status: 401 }
       );
 
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     const user = await User.findOne({ id: payload.id }).lean<OUser>();
     if (!user)
       return NextResponse.json(
-        { ok: false, error: "User không hợp lệ" },
+        { ok: false, error: "User không hợp lệ!" },
         { status: 401 }
       );
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { ok: false, error: "Refresh token không hợp lệ" },
+      { ok: false, error: "Refresh token không hợp lệ!" },
       { status: 401 }
     );
   }

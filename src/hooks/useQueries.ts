@@ -3,7 +3,7 @@
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-export default function useQuery() {
+export default function useQueries() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

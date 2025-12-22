@@ -1,19 +1,54 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
+import ReactCodeMirror, {
+  EditorView,
+  highlightActiveLine,
+  highlightSpecialChars,
+  keymap,
+  lineNumbers,
+} from "@uiw/react-codemirror";
 import { Modal } from "antd";
-import { PlainEditor } from "@/app/problems/[slug]/CodeEditor";
 import { OProblem } from "@/models/Problem";
 import { OSubmission } from "@/models/Submission";
 
 import "./style.css";
+import { draculaHighlight, draculaTheme } from "@/lib/draculaTheme";
+import { search, searchKeymap } from "@codemirror/search";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from "@codemirror/commands";
+
+export interface CodeResponse {
+  stdout: string;
+  stderr: string;
+  compile: string;
+  message: string;
+  status: string;
+}
 
 interface Props {
   problem: OProblem;
   curSubmission: OSubmission;
+  stdin: string;
+  codeResponse: CodeResponse | any;
+  testResponse: CodeResponse | any;
+  submissionResponse: OSubmission;
+  setStdin: (value: string) => void;
 }
 
-export default function BottomContainer({ problem, curSubmission }: Props) {
+export default function BottomContainer({
+  problem,
+  curSubmission,
+  stdin,
+  setStdin,
+  codeResponse,
+  testResponse,
+  submissionResponse,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
@@ -24,11 +59,27 @@ export default function BottomContainer({ problem, curSubmission }: Props) {
     "stdout" | "stderr" | "compile" | "message" | "testcase"
   >("stdout");
 
+  const initialPanelState = useMemo(
+    () => (!curSubmission ? "testcase" : panelState),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [curSubmission]
+  );
+
   useEffect(() => {
-    if (!curSubmission) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPanelState("testcase");
-  }, [curSubmission]);
+    setPanelState(initialPanelState);
+  }, [initialPanelState]);
+
+  const [stdout, setStdout] = useState("");
+  const [stderr, setStdErr] = useState("");
+  const [compileMessage, setCompileMessage] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setStdout(codeResponse?.output);
+    setStdErr(codeResponse?.stderr);
+    setCompileMessage(codeResponse?.compile);
+    setMessage(codeResponse?.message);
+  }, [codeResponse]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -76,7 +127,28 @@ export default function BottomContainer({ problem, curSubmission }: Props) {
           <TabItem title="STDIN" active={true} onClick={() => {}} />
         </div>
         {problem && (
-          <PlainEditor value={problem.testcases[0].input} editable={true} />
+          <ReactCodeMirror
+            className="flex-1 font-jetbrains overflow-auto"
+            height="100%"
+            value={stdin}
+            onChange={setStdin}
+            theme={draculaTheme}
+            extensions={[
+              search(),
+              history(),
+              lineNumbers(),
+              highlightSpecialChars(),
+              highlightActiveLine(),
+              keymap.of([
+                indentWithTab,
+                ...defaultKeymap,
+                ...searchKeymap,
+                ...historyKeymap,
+              ]),
+              EditorView.lineWrapping,
+              draculaHighlight,
+            ]}
+          />
         )}
       </div>
       <div
@@ -131,10 +203,106 @@ export default function BottomContainer({ problem, curSubmission }: Props) {
             }}
           />
         </div>
-        {(panelState === "stdout" && <PlainEditor />) ||
-          (panelState === "stderr" && <PlainEditor />) ||
-          (panelState === "compile" && <PlainEditor />) ||
-          (panelState === "message" && <PlainEditor />)}
+        {(panelState === "stdout" && (
+          <ReactCodeMirror
+            className="flex-1 font-jetbrains overflow-auto select-text"
+            height="100%"
+            value={stdout}
+            onChange={setStdout}
+            theme={draculaTheme}
+            extensions={[
+              search(),
+              history(),
+              lineNumbers(),
+              highlightSpecialChars(),
+              highlightActiveLine(),
+              keymap.of([
+                indentWithTab,
+                ...defaultKeymap,
+                ...searchKeymap,
+                ...historyKeymap,
+              ]),
+              EditorView.lineWrapping,
+              draculaHighlight,
+              EditorView.editable.of(false),
+            ]}
+          />
+        )) ||
+          (panelState === "stderr" && (
+            <ReactCodeMirror
+              className="flex-1 font-jetbrains overflow-auto select-text"
+              height="100%"
+              value={stderr}
+              onChange={setStdErr}
+              theme={draculaTheme}
+              extensions={[
+                search(),
+                history(),
+                lineNumbers(),
+                highlightSpecialChars(),
+                highlightActiveLine(),
+                keymap.of([
+                  indentWithTab,
+                  ...defaultKeymap,
+                  ...searchKeymap,
+                  ...historyKeymap,
+                ]),
+                EditorView.lineWrapping,
+                draculaHighlight,
+                EditorView.editable.of(false),
+              ]}
+            />
+          )) ||
+          (panelState === "compile" && (
+            <ReactCodeMirror
+              className="flex-1 font-jetbrains overflow-auto select-text"
+              height="100%"
+              value={compileMessage}
+              onChange={setCompileMessage}
+              theme={draculaTheme}
+              extensions={[
+                search(),
+                history(),
+                lineNumbers(),
+                highlightSpecialChars(),
+                highlightActiveLine(),
+                keymap.of([
+                  indentWithTab,
+                  ...defaultKeymap,
+                  ...searchKeymap,
+                  ...historyKeymap,
+                ]),
+                EditorView.lineWrapping,
+                draculaHighlight,
+                EditorView.editable.of(false),
+              ]}
+            />
+          )) ||
+          (panelState === "message" && (
+            <ReactCodeMirror
+              className="flex-1 font-jetbrains overflow-auto select-text"
+              height="100%"
+              value={message}
+              onChange={setMessage}
+              theme={draculaTheme}
+              extensions={[
+                search(),
+                history(),
+                lineNumbers(),
+                highlightSpecialChars(),
+                highlightActiveLine(),
+                keymap.of([
+                  indentWithTab,
+                  ...defaultKeymap,
+                  ...searchKeymap,
+                  ...historyKeymap,
+                ]),
+                EditorView.lineWrapping,
+                draculaHighlight,
+                EditorView.editable.of(false),
+              ]}
+            />
+          ))}
         {(panelState === "testcase" && curSubmission && (
           <TestcasePanel
             testcases={curSubmission.testcases}
@@ -143,7 +311,23 @@ export default function BottomContainer({ problem, curSubmission }: Props) {
             problem={problem}
           />
         )) ||
-          (panelState === "testcase" && !curSubmission && (
+          (panelState === "testcase" && submissionResponse && (
+            <TestcasePanel
+              testcases={submissionResponse.testcases}
+              runtime={submissionResponse.runtime}
+              memory={submissionResponse.memory}
+              problem={problem}
+            />
+          )) ||
+          (panelState === "testcase" && testResponse && (
+            <TestcasePanel
+              testcases={[testResponse]}
+              runtime={testResponse.time}
+              memory={testResponse.memory}
+              problem={problem}
+            />
+          )) ||
+          (panelState === "testcase" && !curSubmission && !testResponse && (
             <div className="p-8 text-center text-gray-500">
               Chưa có submission để hiển thị
             </div>
@@ -237,9 +421,9 @@ const Testcase = ({ testcase, i, problem }: any) => {
             {testcase.memory ? `${(testcase.memory / 1024).toFixed(1)}MB` : "-"}
           </div>
         </div>
-        {!testcase.passed && testcase.message && (
+        {!testcase.passed && testcase.title && (
           <div className="mt-2 text-xs text-red-400 font-mono w-full overflow-hidden text-ellipsis whitespace-nowrap">
-            {testcase.message}
+            {testcase.title}
           </div>
         )}
       </div>
@@ -259,11 +443,11 @@ const Testcase = ({ testcase, i, problem }: any) => {
               !testcase.passed ? "text-red-400" : "text-green-500"
             }`}
           >
-            ({testcase.message})
+            ({testcase.title})
           </span>
           <div className="flex flex-col w-full gap-3">
             <span className="font-semibold text-base">Đầu vào</span>
-            <pre className="whitespace-pre-wrap w-full p-2.5 rounded-lg bg-steel-gray text-base text-[#ffffffcc] max-h-[200px]">
+            <pre className="whitespace-pre-wrap w-full p-2.5 rounded-lg bg-steel-gray text-base text-[#ffffffcc] max-h-[200px] min-h-11 overflow-x-hidden overflow-y-auto">
               {problem ? problem.testcases[i]?.input : "Đang tải..."}
             </pre>
           </div>
@@ -271,7 +455,7 @@ const Testcase = ({ testcase, i, problem }: any) => {
             <div className="flex flex-col w-full gap-3">
               <span className="font-semibold text-base">Đầu ra</span>
               <pre
-                className={`max-h-[200px] whitespace-pre-wrap w-full p-2.5 rounded-lg text-base text-[#ffffffcc] ${
+                className={`max-h-[200px] whitespace-pre-wrap w-full p-2.5 rounded-lg text-base min-h-11 overflow-x-hidden overflow-y-auto text-[#ffffffcc] ${
                   !testcase.passed
                     ? "bg-[#f33b2033]"
                     : "bg-[oklch(72.887%_0.21192_147.841/0.317)]"
@@ -282,7 +466,7 @@ const Testcase = ({ testcase, i, problem }: any) => {
             </div>
             <div className="flex flex-col w-full gap-3">
               <span className="font-semibold text-base">Dự kiến</span>
-              <pre className="max-h-[200px] whitespace-pre-wrap w-full p-2.5 rounded-lg text-base text-[#ffffffcc] bg-[#329bff33]">
+              <pre className="max-h-[200px] whitespace-pre-wrap w-full p-2.5 rounded-lg text-base min-h-11 overflow-x-hidden overflow-y-auto text-[#ffffffcc] bg-[#329bff33]">
                 {problem ? problem.testcases[i]?.output : "Đang tải..."}
               </pre>
             </div>
