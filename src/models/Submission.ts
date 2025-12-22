@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
 type Testcase = {
@@ -87,7 +88,7 @@ const SubmissionSchema = new Schema<ISubmission>(
       required: true,
       default: [],
       validate: [
-        (v) => Array.isArray(v) && v.length > 0,
+        (v: any) => Array.isArray(v) && v.length > 0,
         "Phải có ít nhất 1 testcase",
       ],
     },
