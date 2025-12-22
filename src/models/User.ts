@@ -98,7 +98,7 @@ UserSchema.set("toObject", {
   transform: (_doc, ret) => {
     delete (ret as any).password;
     delete (ret as any).__v;
-    ret._id = ret._id!.toString();
+    (ret as any)._id = ret._id!.toString();
     return ret;
   },
 });
